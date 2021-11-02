@@ -1,12 +1,17 @@
 <script setup lang="ts">
-// This starter template is using Vue 3 <script setup> SFCs
-// Check out https://v3.vuejs.org/api/sfc-script-setup.html#sfc-script-setup
 import HelloWorld from './components/HelloWorld.vue'
+import { storeToRefs } from 'pinia'
+import { useShellStore, initShellStore } from './App.store';
+
+const shellStore = useShellStore()
+initShellStore(shellStore)
+const { upn } = storeToRefs(shellStore)
 </script>
 
 <template>
   <img alt="Vue logo" src="./assets/logo.png" />
   <HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
+  <h1>{{ upn }}</h1>
 </template>
 
 <style>
