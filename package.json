@@ -1,42 +1,51 @@
 {
-  "name": "codehq-ts-app",
-  "description": "codehq-ts-app",
-  "version": "0.1.0",
-  "author": {
-    "email": "hugh.hoang@codehq.nz",
-    "name": "Hugh Hoang"
-  },
-  "bugs": {
-    "url": "https://github.com/hxhieu/codehq-ts-app/issues"
-  },
-  "dependencies": {
-    "pinia": "^2.0.0",
-    "vue": "^3.2.16"
-  },
-  "devDependencies": {
-    "@vitejs/plugin-vue": "^1.9.3",
-    "typescript": "^4.4.3",
-    "vite": "^2.6.4",
-    "vue-tsc": "^0.3.0"
-  },
-  "homepage": "https://github.com/hxhieu/codehq-ts-app",
-  "keywords": [
-    "app",
-    "codehq",
-    "spa",
-    "timesheet",
-    "vue",
-    "web"
-  ],
-  "license": "UNLICENSED",
-  "main": "src/main.ts",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/hxhieu/codehq-ts-app"
-  },
-  "scripts": {
-    "build": "vue-tsc --noEmit && vite build",
-    "dev": "vite",
-    "serve": "vite preview"
-  }
+	"name": "codehq-ts-app",
+	"description": "codehq-ts-app",
+	"version": "0.1.0",
+	"author": {
+		"email": "hugh.hoang@codehq.nz",
+		"name": "Hugh Hoang"
+	},
+	"bugs": {
+		"url": "https://github.com/hxhieu/codehq-ts-app/issues"
+	},
+	"dependencies": {
+		"@typescript-eslint/eslint-plugin": "^5.3.0",
+		"@typescript-eslint/parser": "^5.3.0",
+		"@vue/eslint-config-typescript": "^9.0.0",
+		"eslint": "^8.1.0",
+		"eslint-config-prettier": "^8.3.0",
+		"eslint-plugin-vue": "^8.0.3",
+		"pinia": "^2.0.0",
+		"prettier": "^2.4.1",
+		"vue": "^3.2.16"
+	},
+	"devDependencies": {
+		"@vitejs/plugin-vue": "^1.9.3",
+		"typescript": "^4.4.3",
+		"vite": "^2.6.4",
+		"vue-tsc": "^0.3.0"
+	},
+	"homepage": "https://github.com/hxhieu/codehq-ts-app",
+	"keywords": [
+		"app",
+		"codehq",
+		"spa",
+		"timesheet",
+		"vue",
+		"web"
+	],
+	"license": "UNLICENSED",
+	"main": "src/main.ts",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/hxhieu/codehq-ts-app"
+	},
+	"scripts": {
+		"build": "vue-tsc --noEmit && vite build",
+		"dev": "vite",
+		"format": "prettier .  --write",
+		"lint": "eslint --ext .ts,.js,.vue --ignore-path .gitignore src",
+		"serve": "vite preview"
+	}
 }
