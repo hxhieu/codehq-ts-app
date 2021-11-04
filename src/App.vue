@@ -1,26 +1,12 @@
 <script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-import { storeToRefs } from 'pinia'
-import { useShellStore, initShellStore } from './App.store'
+import { initShellStore } from './App.store'
+import { ref } from 'vue'
 
-const shellStore = useShellStore()
-initShellStore(shellStore)
-const { upn } = storeToRefs(shellStore)
+const loading = ref(true)
+initShellStore().finally(() => (loading.value = false))
 </script>
 
 <template>
-	<img alt="Vue logo" src="./assets/logo.png" />
-	<HelloWorld msg="Hello Vue 3 + TypeScript + Vite" />
-	<h1>{{ upn }}</h1>
+	<h1 v-if="loading">Configuring the application...</h1>
+	<router-view v-else></router-view>
 </template>
-
-<style>
-#app {
-	font-family: Avenir, Helvetica, Arial, sans-serif;
-	-webkit-font-smoothing: antialiased;
-	-moz-osx-font-smoothing: grayscale;
-	text-align: center;
-	color: #2c3e50;
-	margin-top: 60px;
-}
-</style>

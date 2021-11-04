@@ -1,38 +1,105 @@
-import { defineStore, Store } from 'pinia'
+import { defineStore, _GettersTree as PiniaGettersTree } from 'pinia'
 import { SHELL_STORE_KEY } from './store.keys'
+import { ApiResponse, ClientConfiguration } from './types/models'
+import { get } from './utils/http-client'
+import { error } from './utils/logger'
+import { router } from './router'
 
-export interface ShellStoreState {
-	upn: string
+interface ShellStoreState {
+	upn?: string
 	configUrl: string
 	apiUrl: string
 	issuerUrl: string
 	clientId: string
 }
 
-const useShellStore = defineStore<string, ShellStoreState>(SHELL_STORE_KEY, {
+interface ShellStoreGetter extends PiniaGettersTree<ShellStoreState> {
+	validConfig: (state: ShellStoreState) => boolean
+}
+
+interface ShellStoreAction {
+	fetchConfiguration: (
+		configUrl: string,
+	) => Promise<ClientConfiguration | undefined>
+}
+
+/* Actions implementations */
+const fetchConfiguration = async (
+	configUrl: string,
+): Promise<ClientConfiguration | undefined> => {
+	const response = await get<ApiResponse<ClientConfiguration>>(configUrl)
+	if (response.error) {
+		throw new Error(response.error)
+	}
+	return response.data
+}
+
+const useShellStore = defineStore<
+	string,
+	ShellStoreState,
+	ShellStoreGetter,
+	ShellStoreAction
+>(SHELL_STORE_KEY, {
 	state: () => ({
 		upn: '',
-		configUrl: '',
+		configUrl: import.meta.env.VITE_CLIENT_CONFIGURATION_URL as string,
 		apiUrl: '',
 		issuerUrl: '',
 		clientId: '',
 	}),
+	getters: {
+		validConfig: (state) =>
+			!!state.apiUrl && !!state.clientId && !!state.issuerUrl,
+	},
+	actions: {
+		fetchConfiguration,
+	},
 })
 
-const initShellStore = (store: Store<string, ShellStoreState>) => {
+const initShellStore = async () => {
+	const store = useShellStore()
 	// Auto save state to localStorage
 	store.$subscribe((_, state) => {
 		localStorage.setItem(SHELL_STORE_KEY, JSON.stringify(state))
 	})
 
-	// Rehydrate the store from localStorage
+	// Try to rehydrate the state from the localStorage
 	const savedStateJson = localStorage.getItem(SHELL_STORE_KEY)
-	if (!savedStateJson) {
-		localStorage.setItem(SHELL_STORE_KEY, JSON.stringify(store))
-	} else {
-		const savedState = JSON.parse(savedStateJson)
+	try {
+		const savedState = JSON.parse(savedStateJson || '{}')
 		delete savedState.$id
 		store.$state = savedState
+	} catch (err) {
+		error(`Failed to rehydrate the state from localStorage. ${err}`)
+		// Fail to load the configure then reset/reload to restart
+		localStorage.removeItem(SHELL_STORE_KEY)
+		window.location.reload()
+	}
+
+	// Validate the configuration
+	if (!store.validConfig) {
+		try {
+			const { configUrl } = store
+			const clientConfig = await store.fetchConfiguration(configUrl)
+			if (!clientConfig) {
+				throw new Error(
+					`Client configuration is not set on the server. Fetched from ${configUrl}`,
+				)
+			}
+			const {
+				auth: { issuer: issuerUrl, client_id: clientId },
+				api_url: apiUrl,
+			} = clientConfig
+			store.$state = {
+				configUrl,
+				issuerUrl,
+				clientId,
+				apiUrl,
+			}
+		} catch (err) {
+			error(err)
+			router.replace('/configuration')
+		}
 	}
 }
 
