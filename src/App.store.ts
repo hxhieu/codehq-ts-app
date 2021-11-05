@@ -2,19 +2,23 @@ import { defineStore, _GettersTree as PiniaGettersTree } from 'pinia'
 import { SHELL_STORE_KEY } from './store.keys'
 import { ApiResponse, ClientConfiguration } from './types/models'
 import { get } from './utils/http-client'
-import { error } from './utils/logger'
+import * as logger from './utils/logger'
+import * as alert from './utils/alert'
 import { router } from './router'
 
 interface ShellStoreState {
-	upn?: string
+	upn: string
+	accessToken: string
 	configUrl: string
 	apiUrl: string
 	issuerUrl: string
 	clientId: string
+	theme: 'dark' | 'light'
 }
 
 interface ShellStoreGetter extends PiniaGettersTree<ShellStoreState> {
 	validConfig: (state: ShellStoreState) => boolean
+	isLoggedIn: (state: ShellStoreState) => boolean
 }
 
 interface ShellStoreAction {
@@ -42,14 +46,17 @@ const useShellStore = defineStore<
 >(SHELL_STORE_KEY, {
 	state: () => ({
 		upn: '',
+		accessToken: '',
 		configUrl: import.meta.env.VITE_CLIENT_CONFIGURATION_URL as string,
 		apiUrl: '',
 		issuerUrl: '',
 		clientId: '',
+		theme: 'dark',
 	}),
 	getters: {
 		validConfig: (state) =>
 			!!state.apiUrl && !!state.clientId && !!state.issuerUrl,
+		isLoggedIn: (state) => !!state.upn && !!state.accessToken,
 	},
 	actions: {
 		fetchConfiguration,
@@ -70,7 +77,7 @@ const initShellStore = async () => {
 		delete savedState.$id
 		store.$state = savedState
 	} catch (err) {
-		error(`Failed to rehydrate the state from localStorage. ${err}`)
+		logger.error(`Failed to rehydrate the state from localStorage. ${err}`)
 		// Fail to load the configure then reset/reload to restart
 		localStorage.removeItem(SHELL_STORE_KEY)
 		window.location.reload()
@@ -91,13 +98,14 @@ const initShellStore = async () => {
 				api_url: apiUrl,
 			} = clientConfig
 			store.$state = {
-				configUrl,
+				...store,
 				issuerUrl,
 				clientId,
 				apiUrl,
 			}
 		} catch (err) {
-			error(err)
+			logger.error(err)
+			alert.error(`Failed to fetch the configuration. ${err}`, 10000)
 			router.replace('/configuration')
 		}
 	}

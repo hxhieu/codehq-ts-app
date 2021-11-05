@@ -1,0 +1,7 @@
+.ant-menu-item.icon-only .ant-menu-title-content {
+	display: none;
+}
+
+.ant-menu-item.right {
+	margin-left: auto;
+}
