@@ -9,8 +9,10 @@ initShellStore().finally(() => (loading.value = false))
 </script>
 
 <template>
-	<TopMenu />
-	<h1 v-if="loading">Configuring the application...</h1>
+	<TopMenu v-if="!loading" />
+	<div v-if="loading" :class="styles.configurationLoader">
+		<h1>Configuring the application...</h1>
+	</div>
 	<div v-else :class="styles.mainContainer">
 		<router-view></router-view>
 	</div>

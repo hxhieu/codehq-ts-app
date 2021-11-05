@@ -13,10 +13,11 @@ const get = async <T>(url: string, jwt?: string): Promise<T> => {
 	}
 	try {
 		const response = await fetch(url, options)
-		if (response.status >= 300) {
+		const { status, statusText } = response
+		if (status >= 300) {
 			error(response)
 			const err = await response.text()
-			return Promise.reject(`${response.statusText} - ${err}`)
+			return Promise.reject(`${status} ${statusText} - ${err}`)
 		}
 		return response.json()
 	} catch (err) {
