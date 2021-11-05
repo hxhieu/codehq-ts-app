@@ -22,6 +22,13 @@ const routes: RouteRecordRaw[] = [
 		},
 	},
 	{
+		path: '/auth_callback',
+		component: () => import('./views/AuthCallback.vue'),
+		meta: {
+			anon: true,
+		},
+	},
+	{
 		path: '/401',
 		component: () => import('./views/401.vue'),
 		meta: {
