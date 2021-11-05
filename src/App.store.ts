@@ -11,6 +11,7 @@ interface ShellStoreState {
 	apiUrl: string
 	issuerUrl: string
 	clientId: string
+	theme: 'dark' | 'light'
 }
 
 interface ShellStoreGetter extends PiniaGettersTree<ShellStoreState> {
@@ -46,6 +47,7 @@ const useShellStore = defineStore<
 		apiUrl: '',
 		issuerUrl: '',
 		clientId: '',
+		theme: 'dark',
 	}),
 	getters: {
 		validConfig: (state) =>
@@ -91,7 +93,7 @@ const initShellStore = async () => {
 				api_url: apiUrl,
 			} = clientConfig
 			store.$state = {
-				configUrl,
+				...store,
 				issuerUrl,
 				clientId,
 				apiUrl,
